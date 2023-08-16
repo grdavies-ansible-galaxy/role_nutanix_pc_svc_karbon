@@ -1,0 +1,27 @@
+---
+- name: "Download Karbon image {{ uuid }}"
+  uri:
+    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/karbon/acs/image/download"
+    body:
+      uuid: "{{ uuid }}"
+    method: POST
+    validate_certs: "{{ validate_certs }}"
+    body_format: json
+    status_code: 200
+    headers:
+      Authorization: "{{ nutanix_api_auth }}"
+  register: karbon_image_download
+  ignore_errors: false
+
+- name: Wait for image(s) to complete download
+  uri:
+    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/karbon/acs/image/list"
+    method: GET
+    validate_certs: "{{ validate_certs }}"
+    status_code: 200
+    headers:
+      Authorization: "{{ nutanix_api_auth }}"
+  register: nutanix_karbon_image_download_list
+  ignore_errors: false
+  until:
+    - nutanix_karbon_image_download_list.json | selectattr('status','equalto','Downloaded) | list | count == nutanix_karbon_image_download_list.json | list | count

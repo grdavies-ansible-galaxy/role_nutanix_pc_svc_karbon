@@ -1,0 +1,25 @@
+---
+# tasks file for nutanix_role_prism_karbon
+- name: Setup connection to Nutanix API
+  ansible.builtin.include_tasks: setup_api.yml
+
+- name: "Task can only be run against Prism Central"
+  ansible.builtin.fail:
+    msg: "'nutanix_host' needs to be set to the IP or VIP of Prism Central. Please check the nutanix_host variable and try again."
+  when:
+    - nutanix_endpoint_prism_type != 'pc'
+
+- name: Get KArbon status
+  ansible.builtin.include_tasks: karbon_status.yml
+
+- name: Enable Karbon
+  ansible.builtin.include_tasks: enable_karbon.yml
+  when:
+    - nutanix_karbon_enable
+    - not nutanix_karbon_enabled
+
+- name: Download Karbon OS image(s)
+  ansible.builtin.include_tasks: download_image.yml
+  when:
+    - nutanix_karbon_download_images
+    - nutanix_karbon_enabled

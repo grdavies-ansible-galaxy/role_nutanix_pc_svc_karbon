@@ -1,0 +1,13 @@
+---
+# defaults file for nutanix_role_prism_karbon
+nutanix_host: ""
+nutanix_username: ""
+nutanix_password: ""
+nutanix_port: 9440
+validate_certs: false
+nutanix_debug: false
+nutanix_karbon_enable: false
+nutanix_karbon_download_images: false
+
+nutanix_karbon_enabled: false
+nutanix_karbon_images_available: []

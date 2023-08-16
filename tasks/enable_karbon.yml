@@ -1,0 +1,50 @@
+---
+# enable_karbon.yml tasks file for nutanix_prism_role_karbon_enable
+- name: Enable Karbon
+  ansible.builtin.uri:
+    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v1/genesis"
+    body:
+      value: "{\".oid\":\"ClusterManager\",\".method\":\"enable_service_with_prechecks\",\".kwargs\":{\"service_list_json\":\"{\\\"service_list\\\":[\\\"KarbonUIService\\\",\\\"KarbonCoreService\\\"]}\"}}"
+    method: POST
+    validate_certs: "{{ validate_certs }}"
+    body_format: json
+    status_code: 200
+    headers:
+      Authorization: "{{ nutanix_api_auth }}"
+  register: nutanix_karbon_service_enable
+  ignore_errors: false
+
+- name: Debug nutanix_karbon_service_enable.json
+  ansible.builtin.debug:
+    var: nutanix_karbon_service_enable.json
+  when:
+    - nutanix_debug
+
+- name: Wait for Karbon to start
+  ansible.builtin.uri:
+    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v1/genesis"
+    body:
+      value: '{".oid":"ClusterManager",".method":"is_service_enabled",".kwargs":{"service_name":"KarbonUIService"}}'
+    method: POST
+    validate_certs: "{{ validate_certs }}"
+    body_format: json
+    status_code: 200
+    headers:
+      Authorization: "{{ nutanix_api_auth }}"
+  register: nutanix_karbon_service_result
+  until:
+    - nutanix_karbon_service_result.json | regex_search('true')
+  retries: 30
+  delay: 10
+
+- name: Update fact karbon_enabled if successful
+  ansible.builtin.set_fact:
+    nutanix_karbon_enabled: true
+  when:
+    - nutanix_karbon_service_result.json | search("true")
+
+- name: Debug nutanix_karbon_enabled
+  ansible.builtin.debug:
+    var: nutanix_karbon_enabled
+  when:
+    - nutanix_debug

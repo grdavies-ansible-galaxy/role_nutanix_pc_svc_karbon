@@ -1,0 +1,41 @@
+---
+- name: Get Karbon Status
+  ansible.builtin.uri:
+    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v1/genesis"
+    body:
+      value: '{".oid":"ClusterManager",".method":"is_service_enabled",".kwargs":{"service_name":"KarbonUIService"}}'
+    method: POST
+    validate_certs: "{{ validate_certs }}"
+    body_format: json
+    status_code: 200
+    headers:
+      Authorization: "{{ nutanix_api_auth }}"
+  register: nutanix_karbon_service_result
+  ignore_errors: false
+
+- name: Debug nutanix_karbon_service_result.json
+  ansible.builtin.debug:
+    var: nutanix_karbon_service_result.json
+  when: nutanix_debug
+
+- name: Set fact nutanix_karbon_service_state
+  ansible.builtin.set_fact:
+    nutanix_karbon_service_state: "{{ nutanix_karbon_service_result.json | community.general.json_query(query) | to_json | from_json }}"
+  vars:
+    query: "value"
+
+- name: Debug nutanix_karbon_service_state
+  ansible.builtin.debug:
+    var: nutanix_karbon_service_state
+  when: nutanix_debug
+
+- name: Update fact karbon_enabled if KarbonUIService is enabled
+  ansible.builtin.set_fact:
+    nutanix_karbon_enabled: true
+  when:
+    - true in nutanix_karbon_service_state[".return"]
+
+- name: Debug nutanix_karbon_enabled
+  ansible.builtin.debug:
+    var: nutanix_karbon_enabled
+  when: nutanix_debug
