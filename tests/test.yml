@@ -4,9 +4,9 @@
   roles:
     - role: ../..
   vars:
-    nutanix_host: 10.38.25.39
-    nutanix_username: admin
-    nutanix_password: nx2Tech382!
-    nutanix_debug: yes
-    nutanix_karbon_enable: yes
-    nutanix_karbon_download_images: yes
+    role_nutanix_pc_svc_karbon_host: 10.38.25.39
+    role_nutanix_pc_svc_karbon_username: admin
+    role_nutanix_pc_svc_karbon_password: nx2Tech382!
+    role_nutanix_pc_svc_karbon_validate_debug: true
+    role_nutanix_pc_svc_karbon_enable: true
+    role_nutanix_pc_svc_karbon_download_images: true

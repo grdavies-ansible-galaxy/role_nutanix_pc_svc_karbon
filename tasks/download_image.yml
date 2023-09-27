@@ -2,88 +2,76 @@
 # download_images.yml tasks file for nutanix_prism_role_karbon_enable
 - name: Get available karbon images
   ansible.builtin.uri:
-    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/karbon/acs/image/list"
+    url: "https://{{ role_nutanix_prism_api_url_base }}/karbon/acs/image/list"
     method: GET
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
     headers:
-      Authorization: "{{ nutanix_api_auth }}"
+      Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
     status_code: 200
     return_content: true
-  register: nutanix_karbon_image_list
+  register: role_nutanix_pc_svc_karbon_image_list
   ignore_errors: false
 
-- name: Debug nutanix_karbon_image_list.json
+- name: Debug role_nutanix_pc_svc_karbon_image_list.json
   ansible.builtin.debug:
-    var: nutanix_karbon_image_list.json
-  when: nutanix_debug
+    var: role_nutanix_pc_svc_karbon_image_list.json
+  when: role_nutanix_pc_svc_karbon_validate_debug
 
 - name: Get list of available image uuids that are available
   ansible.builtin.set_fact:
-    nutanix_karbon_images_missing: "{{ nutanix_karbon_image_list.json | community.general.json_query(query) | to_json | from_json }}"
+    role_nutanix_pc_svc_karbon_missing_image_list: >-
+      "{{ role_nutanix_pc_svc_karbon_image_list.json
+      | community.general.json_query(query)
+      | to_json
+      | from_json }}"
   vars:
     query: "[?status != 'Downloaded'].{uuid: uuid}"
 
-- name: Debug nutanix_karbon_images_missing
+- name: Debug role_nutanix_pc_svc_karbon_missing_image_list
   ansible.builtin.debug:
-    var: nutanix_karbon_images_missing
-  when: nutanix_debug
-
-# - name: Stash the downloaded Karbon image UUIDs
-#   set_fact:
-#     nutanix_karbon_images_missing: "{{ nutanix_karbon_images_missing|default([]) + [ {'name': item.version, 'uuid': item.uuid } ] }}"
-#   with_items: "{{ nutanix_karbon_images_available.json }}"
-#   when:
-#     - item.status != "Downloaded"
-
-# - name: Debug nutanix_karbon_images_missing
-#   debug:
-#     var: nutanix_karbon_images_missing
-#   when: nutanix_debug
+    var: role_nutanix_pc_svc_karbon_missing_image_list
+  when: role_nutanix_pc_svc_karbon_validate_debug
 
 - name: Download available Karbon image(s)
   ansible.builtin.uri:
-    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/karbon/acs/image/download"
+    url: "https://{{ role_nutanix_prism_api_url_base }}/karbon/acs/image/download"
     body:
       uuid: item.uuid
     method: POST
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
-      Authorization: "{{ nutanix_api_auth }}"
-  register: karbon_image_download
+      Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
+  register: role_nutanix_pc_svc_karbon_image_download_task
   ignore_errors: false
-  with_items: "{{ nutanix_karbon_images_missing }}"
+  with_items: "{{ role_nutanix_pc_svc_karbon_missing_image_list }}"
 
-- name: Debug nutanix_karbon_image_list.json | list | count
+- name: Debug role_nutanix_pc_svc_karbon_image_list.json | list | count
   ansible.builtin.debug:
-    var: nutanix_karbon_image_list.json | list | count
-  when: nutanix_debug
+    var: role_nutanix_pc_svc_karbon_image_list.json | list | count
+  when: role_nutanix_pc_svc_karbon_validate_debug
 
-- name: Debug nutanix_karbon_image_list.json | selectattr('status','equalto','Downloaded') | list | count
+- name: Debug role_nutanix_pc_svc_karbon_image_list.json | selectattr('status','equalto','Downloaded') | list | count
   ansible.builtin.debug:
-    var: nutanix_karbon_image_list.json | selectattr('status','equalto','Downloaded') | list | count
-  when: nutanix_debug
+    var: role_nutanix_pc_svc_karbon_image_list.json | selectattr('status','equalto','Downloaded') | list | count
+  when: role_nutanix_pc_svc_karbon_validate_debug
 
 - name: Wait for image(s) to complete download
   ansible.builtin.uri:
-    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/karbon/acs/image/list"
+    url: "https://{{ role_nutanix_prism_api_url_base }}/karbon/acs/image/list"
     method: GET
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
-      Authorization: "{{ nutanix_api_auth }}"
+      Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
   register: nutanix_karbon_image_download_list
   ignore_errors: false
-  until:
-    - nutanix_karbon_image_download_list.json | selectattr('status','equalto','Downloaded) | list | count == nutanix_karbon_image_download_list.json | list | count
-# - name: Stash the downloaded Karbon images
-#   set_fact:
-#     karbon_images_available: "{{ karbon_images_available|default([]) + [ {'name': item.version, 'uuid': item.uuid } ] }}"
-#   with_items: "{{ nutanix_karbon_image_download_list.json }}"
-
-# - name: Debug karbon_images_available
-#   debug:
-#     var: karbon_images_available
-#   when: nutanix_debug
+  until: >-
+    "{{ nutanix_karbon_image_download_list.json
+    | selectattr('status', 'equalto', 'Downloaded')
+    | list
+    | count == nutanix_karbon_image_download_list.json
+    | list
+    | count }}"

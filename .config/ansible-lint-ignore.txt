@@ -1,3 +1,1 @@
-tasks/download_image.yml yaml[line-length]
 tasks/enable_karbon.yml yaml[line-length]
-tasks/manage_images.yml yaml[line-length]

@@ -1,13 +1,23 @@
 ---
-# tasks file for nutanix_role_prism_karbon
+# tasks file for role_nutanix_pc_svc_karbon
 - name: Setup connection to Nutanix API
-  ansible.builtin.include_tasks: setup_api.yml
+  ansible.builtin.include_role:
+    name: grdavies.role_nutanix_prism_api
+  vars:
+    role_nutanix_prism_api_host: "{{ role_nutanix_pc_svc_karbon_host }}"
+    role_nutanix_prism_api_username: "{{ role_nutanix_pc_svc_karbon_username }}"
+    role_nutanix_prism_api_password: "{{ role_nutanix_pc_svc_karbon_password }}"
+    role_nutanix_prism_api_port: "{{ role_nutanix_pc_svc_karbon_port | default(omit) }}"
+    role_nutanix_prism_api_validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs | default(omit) }}"
+    role_nutanix_prism_api_debug: "{{ role_nutanix_pc_svc_karbon_validate_debug | default(omit) }}"
 
 - name: "Task can only be run against Prism Central"
   ansible.builtin.fail:
-    msg: "'nutanix_host' needs to be set to the IP or VIP of Prism Central. Please check the nutanix_host variable and try again."
+    msg:
+      "'role_nutanix_pc_svc_karbon_host' needs to be set to the IP or VIP of Prism Central. \
+      Please check the role_nutanix_pc_svc_karbon_host variable and try again."
   when:
-    - nutanix_endpoint_prism_type != 'pc'
+    - role_nutanix_prism_api_endpoint_type != 'pc'
 
 - name: Get KArbon status
   ansible.builtin.include_tasks: karbon_status.yml
@@ -15,11 +25,11 @@
 - name: Enable Karbon
   ansible.builtin.include_tasks: enable_karbon.yml
   when:
-    - nutanix_karbon_enable
-    - not nutanix_karbon_enabled
+    - role_nutanix_pc_svc_karbon_enable
+    - not role_nutanix_pc_svc_karbon_enabled
 
 - name: Download Karbon OS image(s)
   ansible.builtin.include_tasks: download_image.yml
   when:
-    - nutanix_karbon_download_images
-    - nutanix_karbon_enabled
+    - role_nutanix_pc_svc_karbon_download_images
+    - role_nutanix_pc_svc_karbon_enabled

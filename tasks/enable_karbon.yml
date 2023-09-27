@@ -2,49 +2,49 @@
 # enable_karbon.yml tasks file for nutanix_prism_role_karbon_enable
 - name: Enable Karbon
   ansible.builtin.uri:
-    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v1/genesis"
+    url: "https://{{ role_nutanix_prism_api_url_base }}/PrismGateway/services/rest/v1/genesis"
     body:
       value: "{\".oid\":\"ClusterManager\",\".method\":\"enable_service_with_prechecks\",\".kwargs\":{\"service_list_json\":\"{\\\"service_list\\\":[\\\"KarbonUIService\\\",\\\"KarbonCoreService\\\"]}\"}}"
     method: POST
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
-      Authorization: "{{ nutanix_api_auth }}"
-  register: nutanix_karbon_service_enable
+      Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
+  register: role_nutanix_pc_svc_karbon_enable_task
   ignore_errors: false
 
-- name: Debug nutanix_karbon_service_enable.json
+- name: Debug role_nutanix_pc_svc_karbon_enable_task.json
   ansible.builtin.debug:
-    var: nutanix_karbon_service_enable.json
+    var: role_nutanix_pc_svc_karbon_enable_task.json
   when:
-    - nutanix_debug
+    - role_nutanix_pc_svc_karbon_validate_debug
 
 - name: Wait for Karbon to start
   ansible.builtin.uri:
-    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v1/genesis"
+    url: "https://{{ role_nutanix_prism_api_url_base }}/PrismGateway/services/rest/v1/genesis"
     body:
       value: '{".oid":"ClusterManager",".method":"is_service_enabled",".kwargs":{"service_name":"KarbonUIService"}}'
     method: POST
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
-      Authorization: "{{ nutanix_api_auth }}"
-  register: nutanix_karbon_service_result
+      Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
+  register: role_nutanix_pc_svc_karbon_service_result
   until:
-    - nutanix_karbon_service_result.json | regex_search('true')
+    - role_nutanix_pc_svc_karbon_service_result.json | regex_search('true')
   retries: 30
   delay: 10
 
 - name: Update fact karbon_enabled if successful
   ansible.builtin.set_fact:
-    nutanix_karbon_enabled: true
+    role_nutanix_pc_svc_karbon_enabled: true
   when:
-    - nutanix_karbon_service_result.json | search("true")
+    - role_nutanix_pc_svc_karbon_service_result.json | search("true")
 
-- name: Debug nutanix_karbon_enabled
+- name: Debug role_nutanix_pc_svc_karbon_enabled
   ansible.builtin.debug:
-    var: nutanix_karbon_enabled
+    var: role_nutanix_pc_svc_karbon_enabled
   when:
-    - nutanix_debug
+    - role_nutanix_pc_svc_karbon_validate_debug

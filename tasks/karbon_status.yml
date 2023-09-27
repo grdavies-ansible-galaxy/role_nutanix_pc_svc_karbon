@@ -1,41 +1,41 @@
 ---
 - name: Get Karbon Status
   ansible.builtin.uri:
-    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v1/genesis"
+    url: "https://{{ role_nutanix_prism_api_url_base }}/PrismGateway/services/rest/v1/genesis"
     body:
       value: '{".oid":"ClusterManager",".method":"is_service_enabled",".kwargs":{"service_name":"KarbonUIService"}}'
     method: POST
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
-      Authorization: "{{ nutanix_api_auth }}"
-  register: nutanix_karbon_service_result
+      Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
+  register: role_nutanix_pc_svc_karbon_service_result
   ignore_errors: false
 
-- name: Debug nutanix_karbon_service_result.json
+- name: Debug role_nutanix_pc_svc_karbon_service_result.json
   ansible.builtin.debug:
-    var: nutanix_karbon_service_result.json
-  when: nutanix_debug
+    var: role_nutanix_pc_svc_karbon_service_result.json
+  when: role_nutanix_pc_svc_karbon_validate_debug
 
-- name: Set fact nutanix_karbon_service_state
+- name: Set fact role_nutanix_pc_svc_karbon_status
   ansible.builtin.set_fact:
-    nutanix_karbon_service_state: "{{ nutanix_karbon_service_result.json | community.general.json_query(query) | to_json | from_json }}"
+    role_nutanix_pc_svc_karbon_status: "{{ role_nutanix_pc_svc_karbon_service_result.json | community.general.json_query(query) | to_json | from_json }}"
   vars:
     query: "value"
 
-- name: Debug nutanix_karbon_service_state
+- name: Debug role_nutanix_pc_svc_karbon_status
   ansible.builtin.debug:
-    var: nutanix_karbon_service_state
-  when: nutanix_debug
+    var: role_nutanix_pc_svc_karbon_status
+  when: role_nutanix_pc_svc_karbon_validate_debug
 
 - name: Update fact karbon_enabled if KarbonUIService is enabled
   ansible.builtin.set_fact:
-    nutanix_karbon_enabled: true
+    role_nutanix_pc_svc_karbon_enabled: true
   when:
-    - true in nutanix_karbon_service_state[".return"]
+    - true in role_nutanix_pc_svc_karbon_status[".return"]
 
-- name: Debug nutanix_karbon_enabled
+- name: Debug role_nutanix_pc_svc_karbon_enabled
   ansible.builtin.debug:
-    var: nutanix_karbon_enabled
-  when: nutanix_debug
+    var: role_nutanix_pc_svc_karbon_enabled
+  when: role_nutanix_pc_svc_karbon_validate_debug
