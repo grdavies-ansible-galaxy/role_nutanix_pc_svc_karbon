@@ -23,5 +23,10 @@
       Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
   register: nutanix_karbon_image_download_list
   ignore_errors: false
-  until:
-    - nutanix_karbon_image_download_list.json | selectattr('status','equalto','Downloaded) | list | count == nutanix_karbon_image_download_list.json | list | count
+  until: >
+    nutanix_karbon_image_download_list.json
+    | selectattr('status','equalto','Downloaded)
+    | list
+    | count == nutanix_karbon_image_download_list.json
+    | list
+    | count
