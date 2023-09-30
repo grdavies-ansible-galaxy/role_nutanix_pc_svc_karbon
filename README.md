@@ -18,7 +18,6 @@ This Ansible role manage the Karbon service within Prism Central.
 ## Dependencies
 
 - grdavies.role_nutanix_prism_api
-- grdavies.role_nutanix_prism_monitor_task
 
 ## Example Playbook
 
