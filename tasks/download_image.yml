@@ -4,7 +4,7 @@
   ansible.builtin.uri:
     url: "https://{{ role_nutanix_prism_api_url_base }}/karbon/acs/image/list"
     method: GET
-    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_host_validate_certs }}"
     headers:
       Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
     status_code: 200
@@ -15,7 +15,7 @@
 - name: Debug role_nutanix_pc_svc_karbon_image_list.json
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_image_list.json
-  when: role_nutanix_pc_svc_karbon_validate_debug
+  when: role_nutanix_pc_svc_karbon_debug
 
 - name: Get list of available image uuids that are available
   ansible.builtin.set_fact:
@@ -30,7 +30,7 @@
 - name: Debug role_nutanix_pc_svc_karbon_missing_image_list
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_missing_image_list
-  when: role_nutanix_pc_svc_karbon_validate_debug
+  when: role_nutanix_pc_svc_karbon_debug
 
 - name: Download available Karbon image(s)
   ansible.builtin.uri:
@@ -38,7 +38,7 @@
     body:
       uuid: item.uuid
     method: POST
-    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_host_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
@@ -50,18 +50,18 @@
 - name: Debug role_nutanix_pc_svc_karbon_image_list.json | list | count
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_image_list.json | list | count
-  when: role_nutanix_pc_svc_karbon_validate_debug
+  when: role_nutanix_pc_svc_karbon_debug
 
 - name: Debug role_nutanix_pc_svc_karbon_image_list.json | selectattr('status','equalto','Downloaded') | list | count
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_image_list.json | selectattr('status','equalto','Downloaded') | list | count
-  when: role_nutanix_pc_svc_karbon_validate_debug
+  when: role_nutanix_pc_svc_karbon_debug
 
 - name: Wait for image(s) to complete download
   ansible.builtin.uri:
     url: "https://{{ role_nutanix_prism_api_url_base }}/karbon/acs/image/list"
     method: GET
-    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_host_validate_certs }}"
     body_format: json
     status_code: 200
     headers:

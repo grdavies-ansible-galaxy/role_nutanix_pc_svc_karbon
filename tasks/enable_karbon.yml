@@ -6,7 +6,7 @@
     body:
       value: "{\".oid\":\"ClusterManager\",\".method\":\"enable_service_with_prechecks\",\".kwargs\":{\"service_list_json\":\"{\\\"service_list\\\":[\\\"KarbonUIService\\\",\\\"KarbonCoreService\\\"]}\"}}"
     method: POST
-    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_host_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
@@ -18,7 +18,7 @@
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_enable_task.json
   when:
-    - role_nutanix_pc_svc_karbon_validate_debug
+    - role_nutanix_pc_svc_karbon_debug
 
 - name: Wait for Karbon to start
   ansible.builtin.uri:
@@ -26,7 +26,7 @@
     body:
       value: '{".oid":"ClusterManager",".method":"is_service_enabled",".kwargs":{"service_name":"KarbonUIService"}}'
     method: POST
-    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_host_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
@@ -47,4 +47,4 @@
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_enabled
   when:
-    - role_nutanix_pc_svc_karbon_validate_debug
+    - role_nutanix_pc_svc_karbon_debug

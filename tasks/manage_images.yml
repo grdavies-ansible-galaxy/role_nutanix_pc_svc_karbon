@@ -5,7 +5,7 @@
     body:
       uuid: "{{ uuid }}"
     method: POST
-    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_host_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
@@ -17,7 +17,7 @@
   uri:
     url: "https://{{ role_nutanix_prism_api_url_base }}/karbon/acs/image/list"
     method: GET
-    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_host_validate_certs }}"
     status_code: 200
     headers:
       Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"

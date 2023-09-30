@@ -5,7 +5,7 @@
     body:
       value: '{".oid":"ClusterManager",".method":"is_service_enabled",".kwargs":{"service_name":"KarbonUIService"}}'
     method: POST
-    validate_certs: "{{ role_nutanix_pc_svc_karbon_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pc_svc_karbon_host_validate_certs }}"
     body_format: json
     status_code: 200
     headers:
@@ -16,7 +16,7 @@
 - name: Debug role_nutanix_pc_svc_karbon_service_result.json
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_service_result.json
-  when: role_nutanix_pc_svc_karbon_validate_debug
+  when: role_nutanix_pc_svc_karbon_debug
 
 - name: Set fact role_nutanix_pc_svc_karbon_status
   ansible.builtin.set_fact:
@@ -27,7 +27,7 @@
 - name: Debug role_nutanix_pc_svc_karbon_status
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_status
-  when: role_nutanix_pc_svc_karbon_validate_debug
+  when: role_nutanix_pc_svc_karbon_debug
 
 - name: Update fact karbon_enabled if KarbonUIService is enabled
   ansible.builtin.set_fact:
@@ -38,4 +38,4 @@
 - name: Debug role_nutanix_pc_svc_karbon_enabled
   ansible.builtin.debug:
     var: role_nutanix_pc_svc_karbon_enabled
-  when: role_nutanix_pc_svc_karbon_validate_debug
+  when: role_nutanix_pc_svc_karbon_debug

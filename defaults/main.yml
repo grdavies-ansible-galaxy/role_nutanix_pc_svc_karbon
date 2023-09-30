@@ -1,11 +1,11 @@
 ---
 # defaults file for nutanix_role_prism_karbon
 role_nutanix_pc_svc_karbon_host: ""
-role_nutanix_pc_svc_karbon_username: ""
-role_nutanix_pc_svc_karbon_password: ""
-role_nutanix_pc_svc_karbon_port: 9440
-role_nutanix_pc_svc_karbon_validate_certs: false
-role_nutanix_pc_svc_karbon_validate_debug: false
+role_nutanix_pc_svc_karbon_host_username: ""
+role_nutanix_pc_svc_karbon_host_password: ""
+role_nutanix_pc_svc_karbon_host_port: 9440
+role_nutanix_pc_svc_karbon_host_validate_certs: false
+role_nutanix_pc_svc_karbon_debug: false
 role_nutanix_pc_svc_karbon_enable: false
 role_nutanix_pc_svc_karbon_download_images: false
 
